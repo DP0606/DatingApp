@@ -26,7 +26,7 @@ namespace API
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        //This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
 
@@ -35,6 +35,8 @@ namespace API
                 options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
             services.AddControllers();
+            //Sigurnosni mehanizam za poziv API-a.
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
@@ -55,6 +57,10 @@ namespace API
 
             app.UseRouting();
 
+            //COR se mora točno ovdje pozivati između Routing i EndPoints
+            //Ovo nam je policy tečaja koji ćemo koristiti-znači možeš sve koristiti ukoliko dolazi s adrese 4200
+            app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
